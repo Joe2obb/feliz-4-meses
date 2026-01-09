@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feliz 4 Meses ❤️</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    font-family: Arial, sans-serif;
+}
+
+body{
+    margin:0;
+    height:100vh;
+    background: linear-gradient(180deg,#ff9a9e,#fad0c4);
+    overflow:hidden;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+/* CORAZONES */
+.heart{
+    position:absolute;
+    bottom:-40px;
+    font-size:18px;
+    animation: float 10s linear infinite;
+    opacity:.8;
+}
+@keyframes float{
+    0%{transform:translateY(0);opacity:1;}
+    100%{transform:translateY(-110vh);opacity:0;}
+}
+
+.container{
+    width:100%;
+    max-width:380px;
+    padding:15px;
+    text-align:center;
+}
+
+.card{
+    background:white;
+    border-radius:20px;
+    padding:20px;
+    box-shadow:0 10px 30px rgba(0,0,0,.15);
+}
+
+.hidden{display:none;}
+
+h1{
+    color:#e63946;
+    font-size:26px;
+    margin-bottom:15px;
+}
+
+/* INPUT */
+.input-box{
+    position:relative;
+}
+
+input, textarea{
+    width:100%;
+    padding:12px 40px 12px 12px;
+    border-radius:14px;
+    border:2px solid #f1c40f;
+    font-size:14px;
+}
+
+textarea{
+    resize:none;
+    height:90px;
+}
+
+.lock{
+    position:absolute;
+    right:12px;
+    top:50%;
+    transform:translateY(-50%);
+    font-size:20px;
+    cursor:pointer;
+}
+
+.hint{
+    font-size:11px;
+    color:#e63946;
+    margin-top:6px;
+}
+
+button{
+    width:100%;
+    margin-top:12px;
+    padding:12px;
+    border:none;
+    border-radius:15px;
+    background:#e85d75;
+    color:white;
+    font-size:15px;
+}
+
+.menu{
+    background:#6c757d;
+    margin-bottom:10px;
+}
+
+.counter{
+    margin-top:10px;
+    font-weight:bold;
+}
+
+/* CARTA */
+.letter-scroll{
+    max-height:75vh;
+    overflow-y:auto;
+}
+
+.photo-box img{
+    width:100%;
+    border-radius:15px;
+    margin-top:15px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div class="container" id="login">
+    <h1>💖 Feliz 4 meses mi amor 💖</h1>
+    <div class="card">
+        <div class="input-box">
+            <input type="password" id="password" placeholder="Contraseña">
+            <span class="lock" id="lockIcon" onclick="togglePassword()">🌂</span>
+        </div>
+        <div class="hint">
+            Hay una contraseña secreta<br>
+            Pista: es otra fecha nuestra
+        </div>
+        <button onclick="checkPassword()">Entrar 💕</button>
+        <p id="error" style="color:red;"></p>
+    </div>
+</div>
+
+<!-- PREGUNTAS -->
+<div class="container hidden" id="questions">
+    <div class="card">
+        <button class="menu" onclick="goMenu()">menú 🏠</button>
+        <h3 id="questionText">Presiona para iniciar 💖</h3>
+        <textarea id="answerInput" class="hidden" placeholder="Escribe tu respuesta aquí..."></textarea>
+        <button id="startBtn" onclick="startQuestions()">Preguntas 💘</button>
+        <button id="nextBtn" class="hidden" onclick="nextQuestion()">Nueva pregunta</button>
+        <button id="resultsBtn" class="hidden" onclick="showResults()">Ver resultados 💕</button>
+        <div class="counter" id="counter">0/6</div>
+    </div>
+</div>
+
+<!-- CARTA -->
+<div class="container hidden" id="letter">
+    <div class="card letter-scroll">
+        <h2>💌 Para ti, amor 💌</h2>
+        <p style="font-size:13px;text-align:left;line-height:1.4;">
+Amor, ya 4 meses desde esa vez que te conocí, no imaginé que llegaríamos a ser pareja.
+No pensé que estar con alguien se sentiría tan lindo, tú me lo has demostrado.
+
+Quiero que lo nuestro sea para siempre, toda la vida.
+Te quiero con toda mi alma, te amo con toda mi vida.
+
+Eres alguien muy especial para mí, no sabes cuánto te amo y me preocupo por ti
+cuando no te sientes bien 🥺❤️
+
+Te prometo que estaré contigo siempre, aunque a veces las cosas se pongan feas,
+siempre estaré contigo aquí.
+
+No somos perfectos, lo sé, pero quiero que estés conmigo en mi vida y en mi alma.
+
+<br><br>
+<b>Feliz 4 meses amor mío de mi vida entera 🥹❤️ y a por muchos más 💕</b>
+        </p>
+
+        <div class="photo-box">
+            <img src="foto_amor.jpg" alt="Nuestra foto">
+        </div>
+
+        <button onclick="goMenu()">Volver 🏠</button>
+    </div>
+</div>
+
+<script>
+const passNormal="090925";
+const passSecret="021024";
+let visible=false;
+
+const questionsList=[
+"¿Qué es lo que más te ha gustado de estos 4 meses juntos amor?",
+"¿Qué momento juntos es el que más te ha gustado mi vida?",
+"¿Si tuvieras que calificar del 1 al 10 nuestra relación, qué número pondrías bebé?",
+"¿Te gustaría que sea más cariñoso contigo amor?",
+"De los regalitos que te he dado, ¿cuál te gusta más y cuál te recuerda a mí cuando no estoy?",
+"¿Qué es lo que más te hace sentir amada cuando estás conmigo?"
+];
+
+let remaining=[],answers=[],current="",count=0;
+
+/* CORAZONES */
+const hearts=["💖","💝","💗","💓","💞","💕"];
+setInterval(()=>{
+    const h=document.createElement("div");
+    h.className="heart";
+    h.textContent=hearts[Math.floor(Math.random()*hearts.length)];
+    h.style.left=Math.random()*100+"vw";
+    h.style.animationDuration=(6+Math.random()*4)+"s";
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(),10000);
+},500);
+
+/* PASSWORD */
+function togglePassword(){
+    visible=!visible;
+    password.type=visible?"text":"password";
+    lockIcon.textContent=visible?"☂️":"🌂";
+}
+
+function checkPassword(){
+    error.textContent="";
+    if(password.value===passNormal){
+        login.classList.add("hidden");
+        questions.classList.remove("hidden");
+    }else if(password.value===passSecret){
+        login.classList.add("hidden");
+        letter.classList.remove("hidden");
+    }else{
+        error.textContent="Contraseña incorrecta 💔";
+    }
+}
+
+/* PREGUNTAS */
+function startQuestions(){
+    remaining=[...questionsList];
+    answers=[];
+    count=0;
+    counter.textContent="0/6";
+    startBtn.classList.add("hidden");
+    nextBtn.classList.remove("hidden");
+    answerInput.classList.remove("hidden");
+    showQuestion();
+}
+
+function showQuestion(){
+    const i=Math.floor(Math.random()*remaining.length);
+    current=remaining.splice(i,1)[0];
+    questionText.textContent=current;
+    answerInput.value="";
+}
+
+function nextQuestion(){
+    if(answerInput.value.trim()==="") return;
+    answers.push({q:current,a:answerInput.value});
+    count++;
+    counter.textContent=count+"/6";
+
+    if(remaining.length===0){
+        questionText.textContent="💖 Terminaste amor 💖";
+        answerInput.classList.add("hidden");
+        nextBtn.classList.add("hidden");
+        resultsBtn.classList.remove("hidden");
+    }else{
+        showQuestion();
+    }
+}
+
+/* RESULTADOS */
+function showResults(){
+    let t="💖 Resultados 💖\n\n";
+    answers.forEach((x,i)=>t+=`${i+1}. ${x.q}\n${x.a}\n\n`);
+    questionText.innerHTML="<pre style='white-space:pre-wrap;font-family:Arial;font-size:14px;'>"+t+"</pre>";
+    resultsBtn.textContent="Copiar resultados 📋";
+    resultsBtn.onclick=()=>copyResults(t);
+}
+
+function copyResults(t){
+    const a=document.createElement("textarea");
+    a.value=t;
+    document.body.appendChild(a);
+    a.select();
+    document.execCommand("copy");
+    a.remove();
+    resultsBtn.textContent="¡Copiado! 💕";
+}
+
+function goMenu(){
+    login.classList.remove("hidden");
+    questions.classList.add("hidden");
+    letter.classList.add("hidden");
+    password.value="";
+}
+</script>
+
+</body>
+</html>
